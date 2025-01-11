@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room Learning</title>
+    <style>
+        body {
+            background-image: url('https://img.freepik.com/free-vector/chemical-lab-science-research-experiments_107791-12840.jpg');
+            background-size: cover;
+            background-position: middle;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e2f;
+            color: #ffffff;
+        }
+        header {
+            background-color: #282c34;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+        .room, .room-list {
+            border: 2px solid #61dafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            background-color: #2e2e3e;
+        }
+        .room h2, .room-list h2 {
+            font-size: 1.5em;
+        }
+        .room p, .room-list p {
+            font-size: 1.1em;
+        }
+        .room button, .room-list button, .room input {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 4px;
+        }
+        .room button, .room-list button {
+            color: #ffffff;
+            background-color: #61dafb;
+            border: none;
+            cursor: pointer;
+        }
+        .room button:hover, .room-list button:hover {
+            background-color: #21a1f1;
+        }
+        .room input {
+            width: 80%;
+            font-size: 1em;
+        }
+        footer {
+            background-color: #282c34;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Escape Room Learning</h1>
+    </header>
+    <main>
+        <!-- Start Interface -->
+        <div class="room" id="startRoom">
+            <h2>Welcome to the Escape Room</h2>
+            <p>You are locked in a series of mysterious rooms. Solve puzzles to unlock the doors and escape!</p>
+            <button onclick="showRoomList()">Start Game</button>
+        </div>
+
+        <!-- Room List Interface -->
+        <div class="room-list" id="roomList" style="display: none;">
+            <h2>Select a Room</h2>
+            <p>Choose a room to start solving puzzles:</p>
+            <div id="roomButtons"></div>
+        </div>
+
+        <!-- Puzzle Interfaces -->
+        <div class="room" id="puzzle" style="display: none;">
+            <h2>Room <span id="currentRoomNumber">1</span>: Puzzle <span id="currentPuzzleNumber">1</span></h2>
+            <p id="puzzleQuestion"></p>
+            <input type="text" id="puzzleAnswer" placeholder="Enter your answer">
+            <button onclick="submitAnswer()">Submit</button>
+            <p id="puzzleFeedback" style="margin-top: 10px;"></p>
+        </div>
+
+        <!-- Room Completion Interface -->
+        <div class="room" id="completionScreen" style="display: none;">
+            <h2>Congratulations!</h2>
+            <p>You have successfully escaped Room <span id="escapedRoomNumber">1</span>. Room <span id="unlockedRoomNumber">2</span> is now unlocked!</p>
+            <button onclick="showRoomList()">Back to Room List</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Escape ClassRoom Made By CodeCatalyst</p>
+    </footer>
+
+    <script>
+        let currentRoom = 1;
+        let currentPuzzle = 1;
+
+        const puzzles = {
+            1: [
+                { question: 'What is the speed of light in a vacuum (in m/s)?', answer: '300000000' },
+                { question: 'What is the atomic number of Oxygen?', answer: '8' },
+                { question: 'What is 12 x 8?', answer: '96' },
+                { question: 'What is the powerhouse of the cell?', answer: 'mitochondria' }
+            ],
+            2: [
+                { question: 'What is the capital of France?', answer: 'paris' },
+                { question: 'Solve: 45 + 55.', answer: '100' },
+                { question: 'What is the largest planet in our solar system?', answer: 'jupiter' },
+                { question: 'Name the process plants use to make food.', answer: 'photosynthesis' }
+            ],
+            3: [
+                { question: 'Who wrote "Hamlet"?', answer: 'shakespeare' },
+                { question: 'What is 144 ÷ 12?', answer: '12' },
+                { question: 'What is the chemical symbol for water?', answer: 'h2o' },
+                { question: 'What organ pumps blood through the body?', answer: 'heart' }
+            ],
+            // Add more rooms here
+        };
+
+        function showRoomList() {
+            document.getElementById('startRoom').style.display = 'none';
+            document.getElementById('completionScreen').style.display = 'none';
+            document.getElementById('roomList').style.display = 'block';
+
+            const roomButtonsContainer = document.getElementById('roomButtons');
+            roomButtonsContainer.innerHTML = '';
+
+            for (let i = 1; i <= Object.keys(puzzles).length; i++) {
+                const button = document.createElement('button');
+                button.textContent = `Room ${i}`;
+                button.onclick = () => startRoom(i);
+                roomButtonsContainer.appendChild(button);
+            }
+        }
+
+        function startRoom(roomNumber) {
+            currentRoom = roomNumber;
+            currentPuzzle = 1;
+            document.getElementById('roomList').style.display = 'none';
+            showPuzzle();
+        }
+
+        function showPuzzle() {
+            const roomPuzzles = puzzles[currentRoom];
+            if (currentPuzzle <= roomPuzzles.length) {
+                const puzzle = roomPuzzles[currentPuzzle - 1];
+                document.getElementById('currentRoomNumber').textContent = currentRoom;
+                document.getElementById('currentPuzzleNumber').textContent = currentPuzzle;
+                document.getElementById('puzzleQuestion').textContent = puzzle.question;
+                document.getElementById('puzzleAnswer').value = '';
+                document.getElementById('puzzleFeedback').textContent = '';
+
+                document.getElementById('puzzle').style.display = 'block';
+                document.getElementById('completionScreen').style.display = 'none';
+            } else {
+                finishRoom();
+            }
+        }
+
+        function submitAnswer() {
+            const roomPuzzles = puzzles[currentRoom];
+            const puzzle = roomPuzzles[currentPuzzle - 1];
+            const userAnswer = document.getElementById('puzzleAnswer').value.trim().toLowerCase();
+            const feedback = document.getElementById('puzzleFeedback');
+
+            if (userAnswer === puzzle.answer) {
+                feedback.textContent = 'Correct!';
+                feedback.style.color = 'green';
+                currentPuzzle++;
+                setTimeout(showPuzzle, 1000);
+            } else {
+                feedback.textContent = 'Incorrect! Try again.';
+                feedback.style.color = 'red';
+            }
+        }
+
+        function finishRoom() {
+            document.getElementById('puzzle').style.display = 'none';
+            document.getElementById('completionScreen').style.display = 'block';
+            document.getElementById('escapedRoomNumber').textContent = currentRoom;
+            document.getElementById('unlockedRoomNumber').textContent = currentRoom + 1;
+        }
+    </script>
+</body>
+</html>
